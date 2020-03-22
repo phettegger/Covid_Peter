@@ -3,6 +3,8 @@ title: "Corona ECDC Data"
 author: "Peter"
 date: "22 3 2020"
 output: html_document
+fig_width: 2
+fig_height: 2
 ---
 
 ```{r setup, include=FALSE}
@@ -48,10 +50,10 @@ head(dat1)
 
 
 
-```{r}
+```{r, fig.width = 7, fig.height = 4}
 library(ggplot2)
 
-countries = c("AT", "CH", "DE", "FR", "IT", "UK", "US")
+countries = c("AT", "CH", "DE", "FR", "IT", "UK")
 dat2 <- subset(dat1, GeoId %in% countries)
 
 ggplot(dat2, aes(x = Date, y = TotalCases, group = Country, colour = Country)) +
