@@ -53,7 +53,7 @@ head(dat1)
 ```{r, fig.width = 7, fig.height = 4}
 library(ggplot2)
 
-countries = c("AT", "CH", "DE", "FR", "IT", "UK")
+countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW")
 dat2 <- subset(dat1, GeoId %in% countries)
 
 ggplot(dat2, aes(x = Date, y = TotalCases, group = Country, colour = Country)) +
