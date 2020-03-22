@@ -383,11 +383,11 @@ url &lt;- paste(&quot;https://www.ecdc.europa.eu/sites/default/files/documents/C
 
 GET(url, authenticate(&quot;:&quot;, &quot;:&quot;, type=&quot;ntlm&quot;), write_disk(tf &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
 <pre><code>## Response [https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-22.xlsx]
-##   Date: 2020-03-22 18:34
+##   Date: 2020-03-22 18:47
 ##   Status: 200
 ##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ##   Size: 240 kB
-## &lt;ON DISK&gt;  C:\Users\phett\AppData\Local\Temp\Rtmp4GlGit\file404354a4632.xlsx</code></pre>
+## &lt;ON DISK&gt;  C:\Users\phett\AppData\Local\Temp\RtmpKgjkvk\file367c6d0e2380.xlsx</code></pre>
 <pre class="r"><code>#read the Dataset sheet into “R”
 
 dat1 &lt;- read_excel(tf)
