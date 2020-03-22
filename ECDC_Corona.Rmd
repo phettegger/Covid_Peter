@@ -1,0 +1,94 @@
+---
+title: "Corona ECDC Data"
+author: "Peter"
+date: "22 3 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readxl)
+
+library(httr)
+
+#create the URL where the dataset is stored with automatic updates every day
+
+url <- paste("https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-",format(Sys.time(), "%Y-%m-%d"), ".xlsx", sep = "")
+
+#url <- "https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-21.xlsx"
+#download the dataset from the website to a local temporary file
+
+GET(url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".xlsx")))
+
+#read the Dataset sheet into “R”
+
+dat1 <- read_excel(tf)
+
+colnames(dat1)[1] <- "Date"
+colnames(dat1)[7] <- "Country"
+
+dat1 <- dat1[with(dat1, order(Country, Date)),]
+
+case.list <- split(dat1$Cases, dat1$Country)
+dat1$TotalCases <- unlist(sapply(case.list, cumsum))
+
+d00 <- min(dat1$Date)
+dat1$d0 <- as.numeric(dat1$Date - d00)/86400
+
+dat1 <- subset(dat1, TotalCases > 50)
+
+head(dat1)
+
+```
+
+
+
+
+```{r}
+library(ggplot2)
+
+countries = c("AT", "CH", "DE", "FR", "IT", "UK", "US")
+dat2 <- subset(dat1, GeoId %in% countries)
+
+ggplot(dat2, aes(x = Date, y = TotalCases, group = Country, colour = Country)) +
+    geom_line() + scale_y_log10()
+
+
+
+library(zoo)
+
+spl1 <- split(1:nrow(dat2), dat2$Country)
+
+FUN1 <- function(i, logCases, days){
+    c(day = days[i[1]], slope = coef(lm(logCases[i] ~ days[i]))[2])
+}
+
+
+l1 <- lapply(spl1, function(i){
+    logCases <- log10(dat2$TotalCases[i])
+    days <- dat2$d0[i]
+    rollapply(data = seq_along(days), width = 5, FUN = FUN1, logCases, days)
+})
+
+df.slopes <- as.data.frame(do.call(rbind, l1))
+colnames(df.slopes)[2] <- "slope"
+
+df.slopes$Country <- rep(names(l1), sapply(l1, nrow))
+df.slopes$doubling.Time <- 1/(log2(10) * df.slopes$slope)
+df.slopes$day <- d00 + df.slopes$day * 86400
+head(df.slopes)
+
+ggplot(df.slopes, aes(x = day, y = slope, group = Country, colour = Country)) +
+    geom_line()
+
+ggplot(df.slopes, aes(x = day, y = doubling.Time, group = Country, colour = Country)) +
+    geom_line()
+
+
+```
+
+
