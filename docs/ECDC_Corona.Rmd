@@ -66,7 +66,7 @@ library(zoo)
 spl1 <- split(1:nrow(dat2), dat2$Country)
 
 FUN1 <- function(i, logCases, days){
-    c(day = days[i[1]], slope = coef(lm(logCases[i] ~ days[i]))[2])
+    c(d0 = days[i[1]], slope = coef(lm(logCases[i] ~ days[i]))[2])
 }
 
 
@@ -80,15 +80,12 @@ df.slopes <- as.data.frame(do.call(rbind, l1))
 colnames(df.slopes)[2] <- "slope"
 
 df.slopes$Country <- rep(names(l1), sapply(l1, nrow))
-df.slopes$doubling.Time <- 1/(log2(10) * df.slopes$slope)
-df.slopes$day <- d00 + df.slopes$day * 86400
+df.slopes$Doubling.Time <- 1/(log2(10) * df.slopes$slope)
+df.slopes$Date <- d00 + df.slopes$d0 * 86400
 head(df.slopes)
 
-ggplot(df.slopes, aes(x = day, y = slope, group = Country, colour = Country)) +
-    geom_line()
-
-ggplot(df.slopes, aes(x = day, y = doubling.Time, group = Country, colour = Country)) +
-    geom_line()
+ggplot(df.slopes, aes(x = Date, y = Doubling.Time, group = Country, colour = Country)) +
+    geom_line() + ylab("Doubling Time / days") + xlab("Date")
 
 
 ```
