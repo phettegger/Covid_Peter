@@ -53,15 +53,19 @@ head(dat1)
 ```{r, fig.width = 7, fig.height = 4}
 library(ggplot2)
 
-countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW")
+countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP")
 dat2 <- subset(dat1, GeoId %in% countries)
 
 ggplot(dat2, aes(x = Date, y = TotalCases, group = Country, colour = Country)) +
-    geom_line() + scale_y_log10()
+    geom_line() +
+    scale_y_log10(n.breaks = 15) +
+    theme(panel.grid.minor.y = element_blank())
 
 
 ggplot(dat2, aes(x = Date, y = Cases, group = Country, colour = Country)) +
-    geom_line() + scale_y_log10() + ylab("New cases")
+    geom_line() + ylab("New cases") + 
+    scale_y_log10(n.breaks = 15) +
+    theme(panel.grid.minor.y = element_blank())
 
 
 library(zoo)
@@ -88,7 +92,9 @@ df.slopes$Date <- d00 + df.slopes$d0 * 86400
 head(df.slopes)
 
 ggplot(df.slopes, aes(x = Date, y = Doubling.Time, group = Country, colour = Country)) +
-    geom_line() + ylab("Doubling Time / days") + xlab("Date")
+    geom_line() + ylab("Doubling Time / days") + xlab("Date") + 
+    scale_y_log10(n.breaks = 15) +
+    theme(panel.grid.minor.y = element_blank())
 
 
 ```
