@@ -82,7 +82,7 @@ FUN1 <- function(i, logCases, days){
 l1 <- lapply(spl1, function(i){
     logCases <- log10(dat2$TotalCases[i])
     days <- dat2$d0[i]
-    rollapply(data = seq_along(days), width = 5, FUN = FUN1, logCases, days)
+    rollapply(data = seq_along(days), width = 4, FUN = FUN1, logCases, days)
 })
 
 df.slopes <- as.data.frame(do.call(rbind, l1))
