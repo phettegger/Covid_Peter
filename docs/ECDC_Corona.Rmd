@@ -1,7 +1,7 @@
 ---
 title: "Corona ECDC Data"
 author: "Peter"
-date: "22 3 2020"
+date: "`r Sys.time()`"
 output: html_document
 fig_width: 2
 fig_height: 2
@@ -21,7 +21,7 @@ library(httr)
 
 url <- paste("https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-",format(Sys.time(), "%Y-%m-%d"), ".xlsx", sep = "")
 
-#url <- "https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-21.xlsx"
+#url <- "https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-23.xlsx"
 #download the dataset from the website to a local temporary file
 
 GET(url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".xlsx")))
@@ -56,17 +56,19 @@ library(ggplot2)
 countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP")
 dat2 <- subset(dat1, GeoId %in% countries)
 
-ggplot(dat2, aes(x = Date, y = TotalCases, group = Country, colour = Country)) +
-    geom_line() +
-    scale_y_log10(n.breaks = 15) +
-    theme(panel.grid.minor.y = element_blank())
+plot.theme <- ggplot() + xlab("Date") + 
+scale_y_log10(n.breaks = 15) +
+scale_x_datetime(date_minor_breaks = "1 day") + 
+theme(panel.grid.minor.y = element_blank())
 
 
-ggplot(dat2, aes(x = Date, y = Cases, group = Country, colour = Country)) +
-    geom_line() + ylab("New cases") + 
-    scale_y_log10(n.breaks = 15) +
-    theme(panel.grid.minor.y = element_blank())
+plot.theme + 
+geom_line(data = dat2, mapping = aes(x = Date, y = TotalCases, group = Country, colour = Country))
 
+plot.theme +
+geom_line(data = dat2,
+   mapping = aes(x = Date, y = Cases, group = Country, colour = Country)) +
+ylab("New cases")
 
 library(zoo)
 
@@ -91,10 +93,8 @@ df.slopes$Doubling.Time <- 1/(log2(10) * df.slopes$slope)
 df.slopes$Date <- d00 + df.slopes$d0 * 86400
 head(df.slopes)
 
-ggplot(df.slopes, aes(x = Date, y = Doubling.Time, group = Country, colour = Country)) +
-    geom_line() + ylab("Doubling Time / days") + xlab("Date") + 
-    scale_y_log10(n.breaks = 15) +
-    theme(panel.grid.minor.y = element_blank())
+plot.theme +  geom_line(data = df.slopes, aes(x = Date, y = Doubling.Time, group = Country, colour = Country))+
+    ylab("Doubling Time / days")
 
 
 ```
