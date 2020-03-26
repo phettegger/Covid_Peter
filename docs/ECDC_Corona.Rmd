@@ -14,14 +14,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(readxl)
-
 library(httr)
+library(RColorBrewer)
 
 #create the URL where the dataset is stored with automatic updates every day
 
 url <- paste("https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-",format(Sys.time(), "%Y-%m-%d"), ".xlsx", sep = "")
 
-#url <- "https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-23.xlsx"
+#url <- "https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-25.xlsx"
 #download the dataset from the website to a local temporary file
 
 GET(url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".xlsx")))
@@ -53,13 +53,14 @@ head(dat1)
 ```{r, fig.width = 7, fig.height = 4}
 library(ggplot2)
 
-countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP")
+countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE")
 dat2 <- subset(dat1, GeoId %in% countries)
 
 plot.theme <- ggplot() + xlab("Date") + 
 scale_y_log10(n.breaks = 15) +
 scale_x_datetime(date_minor_breaks = "1 day") + 
-theme(panel.grid.minor.y = element_blank())
+theme(panel.grid.minor.y = element_blank()) +
+scale_color_brewer(palette = "Paired")
 
 
 plot.theme + 
