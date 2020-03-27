@@ -13,29 +13,24 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
-library(readxl)
+#these libraries need to be loaded
+library(utils)
 library(httr)
-library(RColorBrewer)
 
-#create the URL where the dataset is stored with automatic updates every day
+#download the dataset from the ECDC website to a local temporary file
+GET("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv", authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".csv")))
 
-url <- paste("https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-",format(Sys.time(), "%Y-%m-%d"), ".xlsx", sep = "")
+#read the Dataset sheet into “R”. The dataset will be called "data".
+dat1 <- read.csv(tf, stringsAsFactors = FALSE)
 
-#url <- "https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-2020-03-25.xlsx"
-#download the dataset from the website to a local temporary file
-
-GET(url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".xlsx")))
-
-#read the Dataset sheet into “R”
-
-dat1 <- read_excel(tf)
 
 colnames(dat1)[1] <- "Date"
 colnames(dat1)[7] <- "Country"
+dat1$Date <- as.POSIXct(as.Date(dat1$Date, "%d/%m/%Y"))
 
 dat1 <- dat1[with(dat1, order(Country, Date)),]
 
-case.list <- split(dat1$Cases, dat1$Country)
+case.list <- split(dat1$cases, dat1$Country)
 dat1$TotalCases <- unlist(sapply(case.list, cumsum))
 
 d00 <- min(dat1$Date)
@@ -53,8 +48,8 @@ head(dat1)
 ```{r, fig.width = 7, fig.height = 4}
 library(ggplot2)
 
-countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE")
-dat2 <- subset(dat1, GeoId %in% countries)
+countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US")
+dat2 <- subset(dat1, geoId %in% countries)
 
 plot.theme <- ggplot() + xlab("Date") + 
 scale_y_log10(n.breaks = 15) +
@@ -68,7 +63,7 @@ geom_line(data = dat2, mapping = aes(x = Date, y = TotalCases, group = Country, 
 
 plot.theme +
 geom_line(data = dat2,
-   mapping = aes(x = Date, y = Cases, group = Country, colour = Country)) +
+   mapping = aes(x = Date, y = cases, group = Country, colour = Country)) +
 ylab("New cases")
 
 library(zoo)
