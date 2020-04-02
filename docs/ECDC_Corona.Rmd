@@ -52,7 +52,7 @@ tail(dat1)
 ```{r, fig.width = 7, fig.height = 4}
 library(ggplot2)
 
-countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US")
+countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US", "ES")
 dat2 <- subset(dat1, geoId %in% countries)
 
 plot.theme <- ggplot() + xlab("Date") + 
