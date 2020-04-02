@@ -33,12 +33,16 @@ dat1 <- dat1[with(dat1, order(Country, Date)),]
 case.list <- split(dat1$cases, dat1$Country)
 dat1$TotalCases <- unlist(sapply(case.list, cumsum))
 
+deaths.list <- split(dat1$deaths, dat1$Country)
+dat1$TotalDeaths <- unlist(sapply(deaths.list, cumsum))
+
 d00 <- min(dat1$Date)
 dat1$d0 <- as.numeric(dat1$Date - d00)/86400
 
 dat1 <- subset(dat1, TotalCases > 50)
 
 head(dat1)
+tail(dat1)
 
 ```
 
@@ -65,6 +69,11 @@ plot.theme +
 geom_line(data = dat2,
    mapping = aes(x = Date, y = cases, group = Country, colour = Country)) +
 ylab("New cases")
+
+plot.theme +
+geom_line(data = dat2,
+   mapping = aes(x = Date, y = TotalDeaths, group = Country, colour = Country))
+
 
 library(zoo)
 
