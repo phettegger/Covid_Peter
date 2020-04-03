@@ -41,9 +41,6 @@ dat1$d0 <- as.numeric(dat1$Date - d00)/86400
 
 dat1 <- subset(dat1, TotalCases > 50)
 
-head(dat1)
-tail(dat1)
-
 ```
 
 
@@ -54,6 +51,8 @@ library(ggplot2)
 
 countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US", "ES")
 dat2 <- subset(dat1, geoId %in% countries)
+
+tail(dat2)
 
 plot.theme <- ggplot() + xlab("Date") + 
 scale_y_log10(n.breaks = 15) +
