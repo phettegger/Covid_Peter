@@ -26,6 +26,7 @@ dat1 <- read.csv(tf, stringsAsFactors = FALSE)
 
 colnames(dat1)[1] <- "Date"
 colnames(dat1)[7] <- "Country"
+dat1$Country[dat1$Country == "United_States_of_America"] = "USA"
 dat1$Date <- as.POSIXct(as.Date(dat1$Date, "%d/%m/%Y"))
 
 dat1 <- dat1[with(dat1, order(Country, Date)),]
@@ -35,6 +36,7 @@ dat1$TotalCases <- unlist(sapply(case.list, cumsum))
 
 deaths.list <- split(dat1$deaths, dat1$Country)
 dat1$TotalDeaths <- unlist(sapply(deaths.list, cumsum))
+
 
 d00 <- min(dat1$Date)
 dat1$d0 <- as.numeric(dat1$Date - d00)/86400
@@ -52,7 +54,9 @@ library(ggplot2)
 countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US", "ES")
 dat2 <- subset(dat1, geoId %in% countries)
 
-tail(dat2)
+spl1 <- split(dat2, dat2$Country)
+df1 <- do.call(rbind, lapply(spl1, function(i)i[nrow(i),c(2:6, 11:12, 10)]))
+df1[order(df1$TotalDeaths, decreasing = TRUE),]
 
 plot.theme <- ggplot() + xlab("Date") + 
 scale_y_log10(n.breaks = 15) +
