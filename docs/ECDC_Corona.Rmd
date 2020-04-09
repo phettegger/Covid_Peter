@@ -77,6 +77,11 @@ plot.theme +
 geom_line(data = dat2,
    mapping = aes(x = Date, y = TotalDeaths, group = Country, colour = Country))
 
+plot.theme +
+geom_line(data = dat2,
+   mapping = aes(x = Date, y = deaths, group = Country, colour = Country)) +
+    ylab("Deaths per day")
+
 
 library(zoo)
 
