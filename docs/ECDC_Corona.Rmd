@@ -53,10 +53,15 @@ library(ggplot2)
 
 countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US", "ES")
 dat2 <- subset(dat1, geoId %in% countries)
-
+options(digits = 2)
 spl1 <- split(dat2, dat2$Country)
 df1 <- do.call(rbind, lapply(spl1, function(i)i[nrow(i),c(2:6, 11:12, 10)]))
+df1$deaths.per.1e5 <- df1$TotalDeaths / (df1$popData2018 / 1e5)
+df1$popData2018 = df1$popData2018 / 1e6
+colnames(df1)[8] <- "popData2018.Mio"
+
 df1[order(df1$TotalDeaths, decreasing = TRUE),]
+
 
 plot.theme <- ggplot() + xlab("Date") + 
 scale_y_log10(n.breaks = 15) +
