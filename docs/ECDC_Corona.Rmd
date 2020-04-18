@@ -41,6 +41,14 @@ dat1$TotalDeaths <- unlist(sapply(deaths.list, cumsum))
 d00 <- min(dat1$Date)
 dat1$d0 <- as.numeric(dat1$Date - d00)/86400
 
+
+dat1$deaths.per.1e5 <- dat1$TotalDeaths / (dat1$popData2018 / 1e5)
+dat1$cases.per.1e5 <- (dat1$TotalCases / dat1$popData) * 1e5
+dat1$popData2018 = dat1$popData2018 / 1e6
+colnames(dat1)[match("popData2018", colnames(dat1))] <- "popData2018.Mio"
+dat1$letality.percent <- (dat1$TotalDeaths / dat1$TotalCases) * 100
+
+
 dat1 <- subset(dat1, TotalCases > 50)
 
 ```
@@ -55,14 +63,7 @@ countries = c("AT", "CH", "DE", "FR", "IT", "UK", "TW", "KR", "JP", "SE", "US", 
 dat2 <- subset(dat1, geoId %in% countries)
 options(digits = 2)
 spl1 <- split(dat2, dat2$Country)
-df1 <- do.call(rbind, lapply(spl1, function(i)i[nrow(i),c(2:6, 11:12, 10)]))
-df1$deaths.per.1e5 <- df1$TotalDeaths / (df1$popData2018 / 1e5)
-df1$cases.per.1e5 <- (df1$TotalCases / df1$popData) * 1e5
-df1$popData2018 = df1$popData2018 / 1e6
-colnames(df1)[8] <- "popData2018.Mio"
-
-df1$letality.percent <- (df1$TotalDeaths / df1$TotalCases) * 100
-
+df1 <- do.call(rbind, lapply(spl1, function(i)i[nrow(i),c(2:6, 11:12, 10, 14:16)]))
 
 df1[order(df1$TotalDeaths, decreasing = TRUE),]
 
@@ -71,7 +72,8 @@ plot.theme <- ggplot() + xlab("Date") +
 scale_y_log10(n.breaks = 15) +
 scale_x_datetime(date_minor_breaks = "1 day") + 
 theme(panel.grid.minor.y = element_blank()) +
-scale_color_brewer(palette = "Paired")
+scale_color_brewer(palette = "Paired") +
+    theme(plot.title = element_text(hjust = 0.5))
 
 
 plot.theme + 
@@ -80,7 +82,7 @@ geom_line(data = dat2, mapping = aes(x = Date, y = TotalCases, group = Country, 
 plot.theme +
 geom_line(data = dat2,
    mapping = aes(x = Date, y = cases, group = Country, colour = Country)) +
-ylab("New cases")
+ggtitle("New cases")
 
 plot.theme +
 geom_line(data = dat2,
@@ -89,7 +91,22 @@ geom_line(data = dat2,
 plot.theme +
 geom_line(data = dat2,
    mapping = aes(x = Date, y = deaths, group = Country, colour = Country)) +
-    ylab("Deaths per day")
+    ggtitle("Deaths per day")
+
+plot.theme +
+geom_line(data = dat2,
+   mapping = aes(x = Date, y = deaths.per.1e5, group = Country, colour = Country)) +
+    ggtitle("Deaths per 100.000")
+
+plot.theme +
+geom_line(data = dat2,
+   mapping = aes(x = Date, y = cases.per.1e5, group = Country, colour = Country)) +
+    ggtitle("Cases per 100.000")
+
+plot.theme +
+geom_line(data = dat2,
+   mapping = aes(x = Date, y = letality.percent, group = Country, colour = Country)) +
+    ggtitle("Letality in %")
 
 
 library(zoo)
@@ -116,7 +133,7 @@ df.slopes$Date <- d00 + df.slopes$d0 * 86400
 head(df.slopes)
 
 plot.theme +  geom_line(data = df.slopes, aes(x = Date, y = Doubling.Time, group = Country, colour = Country))+
-    ylab("Doubling Time / days")
+    ggtitle("Doubling Time / days")
 
 
 ```
